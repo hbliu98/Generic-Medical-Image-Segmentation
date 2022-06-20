@@ -34,7 +34,10 @@ def brats19(in_dir, out_dir):
     all_names = []
     modalities = ['t1', 't1ce', 't2', 'flair']
     for tpe in ['HGG', 'LGG']:
-        names = os.listdir(os.path.join(in_dir, tpe))
+        try:
+            names = os.listdir(os.path.join(in_dir, tpe))
+        except:
+            names = []
         for name in names:
             if name == '.DS_Store':
                 continue
