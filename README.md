@@ -16,6 +16,12 @@ The following environments/libraries are required:
 - medpy
 - torchio
 
+## Usage
+1. Convert data to required format, save into DATA/raw, see convert.py
+2. Run preprocess.py. The preprocessed data are saved into DATA/preprocessed
+3. Run train.py.
+You can use brats19_toydata for firing the whole framework, enjoy yourself 😊
+
 ## Folders
 - DATA
   - raw: formatted raw data files, see [Data Organization](#DataOrganization)
@@ -34,6 +40,7 @@ The following environments/libraries are required:
 - tmp: for temporary files
 - utils: useful codes
 - preprocess.py, test.py and train.py: as the name suggests
+- convert.py: convert dataset to required format
 
 ## Data Organization
 - We follow the naming convention used in [nnUNet](https://github.com/MIC-DKFZ/nnUNet): <dataset_name>\_<case_identifier>\_<modality_identifier>.nii.gz

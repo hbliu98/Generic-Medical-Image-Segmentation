@@ -13,11 +13,11 @@ class DiceLoss(nn.Module):
         with torch.no_grad():
             y_onehot = torch.zeros_like(x)
             y_onehot.scatter(1, y.long(), 1)
-        axes = tuple(range(2, len(x.shape)))
+        axes = [0] + list(range(2, len(x.shape)))
         
-        tp = (x * y).sum(axes)
-        fp = (x * (1 - y)).sum(axes)
-        fn = ((1 - x) * y).sum(axes)
+        tp = (x * y_onehot).sum(axes)
+        fp = (x * (1 - y_onehot)).sum(axes)
+        fn = ((1 - x) * y_onehot).sum(axes)
         
         numerator = 2. * tp + self.smooth
         denominator = 2. * tp + fp + fn + self.smooth
@@ -34,7 +34,7 @@ class DiceCELoss(nn.Module):
 
     def forward(self, x, y):
         dc_loss = self.dc(x, y)
-        ce_loss = self.ce(x, y.squeeze(1).long())  
+        ce_loss = self.ce(x, y.squeeze(1).long())
         return dc_loss + ce_loss
 
 

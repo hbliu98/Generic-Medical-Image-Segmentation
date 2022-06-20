@@ -22,3 +22,19 @@ def get_validset(fold):
         subjects.append(subject)
     dataset = tio.SubjectsDataset(subjects)
     return dataset
+
+
+def get_testset(root):
+    names = os.listdir(root)
+
+    subjects = []
+    for name in names:
+        data = np.load(os.path.join(config.DATASET.ROOT, name+'.npz'))['data']
+        subject = tio.Subject(
+            data = tio.ScalarImage(tensor=data[:-1]),
+            label = tio.LabelMap(tensor=data[-1:]),
+            name = name
+        )
+        subjects.append(subject)
+    dataset = tio.SubjectsDataset(subjects)
+    return dataset

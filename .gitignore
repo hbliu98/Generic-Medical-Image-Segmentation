@@ -156,10 +156,13 @@ cython_debug/
 launch.json
 
 # Data files
-*.npz
-*.pkl
-*.nii.gz
-dataset.json
+# *.npz
+# *.pkl
+# *.nii.gz
+# dataset.json
 
 # OS files
 .DS_Store
+
+# experiment files
+*.pth

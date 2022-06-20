@@ -2,6 +2,7 @@ import argparse
 import numpy as np
 import torch.nn as nn
 import torch.optim as optim
+import torch.backends.cudnn as cudnn
 
 from models import *
 from core.config import config
@@ -11,7 +12,8 @@ from core.loss import DiceCELoss, MultiOutLoss
 from dataset.dataset import get_validset
 from dataset.dataloader import get_trainloader
 from dataset.augmenter import get_train_generator
-from utils.utils import determine_device, save_checkpoint, update_config, create_logger
+from utils.utils import determine_device, save_checkpoint, update_config, create_logger, setup_seed
+
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -20,7 +22,13 @@ def parse_args():
     args = parser.parse_args()
     return args
 
+
 def main(args):
+    setup_seed(config.SEED)
+    cudnn.benchmark = config.CUDNN.BENCHMARK
+    cudnn.deterministic = config.CUDNN.DETERMINISTIC
+    cudnn.enabled = config.CUDNN.ENABLED
+
     update_config(config, args.cfg)
 
     net = unet.UNet  # use your network architecture here --> <file_name>.<class_name>
@@ -31,7 +39,7 @@ def main(args):
     else:   # support cuda, mps and ... cpu (really?)
         device = determine_device()
         model = net(config).to(device)
-    optimizer = optim.SGD(model.parameters(), lr=config.TRAIN.LR, weight_decay=config.TRAIN.WEIGHT_DECAY, momentum=0.99, nesterov=True)
+    optimizer = optim.SGD(model.parameters(), lr=config.TRAIN.LR, weight_decay=config.TRAIN.WEIGHT_DECAY, momentum=0.95, nesterov=True)
     scheduler = PolyScheduler(optimizer, t_total=config.TRAIN.EPOCH)
     # deep supervision weights, normalize sum to 1
     criterion = DiceCELoss()
@@ -50,8 +58,8 @@ def main(args):
     for epoch in range(config.TRAIN.EPOCH):
         logger.info('learning rate : {}'.format(optimizer.param_groups[0]['lr']))
         
-        # train(model, train_generator, optimizer, criterion, logger, config, epoch)
-        # scheduler.step()
+        train(model, train_generator, optimizer, criterion, logger, config, epoch)
+        scheduler.step()
         # running validation at every epoch is time consuming
         if epoch%config.VALIDATION_INTERVAL == 0:
             perf = inference(model, validset, logger, config)

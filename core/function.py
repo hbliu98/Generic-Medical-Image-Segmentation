@@ -2,7 +2,6 @@ import torch
 import numpy as np
 import torch.nn as nn
 import torchio as tio
-from collections import OrderedDict
 from medpy.metric.binary import dc
 
 from utils.utils import AverageMeter, determine_device
@@ -34,6 +33,8 @@ def train(model, train_generator, optimizer, criterion, logger, config, epoch):
         # do back-propagation
         optimizer.zero_grad()
         scaler.scale(loss).backward()
+        scaler.unscale_(optimizer)
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 12)
         scaler.step(optimizer)
         scaler.update()
 

@@ -26,7 +26,7 @@ config.MODEL.EXTRA = CN(new_allowed=True)
 config.TRAIN = CN()
 config.TRAIN.LR = 1e-2
 config.TRAIN.WEIGHT_DECAY = 3e-5
-config.TRAIN.BATCH_SIZE = 4
+config.TRAIN.BATCH_SIZE = 16
 config.TRAIN.PATCH_SIZE = [224, 224]
 config.TRAIN.NUM_BATCHES = 250
 config.TRAIN.EPOCH = 200
@@ -34,6 +34,6 @@ config.TRAIN.PARALLEL = False
 config.TRAIN.DEVICES = [0]
 
 config.INFERENCE = CN()
-config.INFERENCE.BATCH_SIZE = 4
+config.INFERENCE.BATCH_SIZE = 16
 config.INFERENCE.PATCH_SIZE = [224, 224]
 config.INFERENCE.PATCH_OVERLAP = [112, 112]
