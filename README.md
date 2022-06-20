@@ -20,6 +20,7 @@ The following environments/libraries are required:
 1. Convert data to required format, save into DATA/raw, see convert.py
 2. Run preprocess.py. The preprocessed data are saved into DATA/preprocessed
 3. Run train.py.
+
 You can use brats19_toydata for firing the whole framework, enjoy yourself 😊
 
 ## Folders
