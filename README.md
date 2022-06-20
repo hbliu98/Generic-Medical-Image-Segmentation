@@ -17,9 +17,9 @@ The following environments/libraries are required:
 - torchio
 
 ## Usage
-1. Convert data to required format, save into DATA/raw, see convert.py
+1. Run convert.py. Convert data to required format, save into DATA/raw
 2. Run preprocess.py. The preprocessed data are saved into DATA/preprocessed
-3. Run train.py.
+3. Run train.py
 
 You can use brats19_toydata for firing the whole framework, enjoy yourself 😊
 
