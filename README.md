@@ -25,7 +25,7 @@ You can use brats19_toydata for firing the whole framework, enjoy yourself 😊
 
 ## Folders
 - DATA
-  - raw: formatted raw data files, see [Data Organization](#DataOrganization)
+  - raw: formatted raw data files, see [Data Organization](#data-organization)
   - preprocessed: preprocessed data files, i.e., crop and normalization
 - dataset: data loading and data augmentation
 - core
