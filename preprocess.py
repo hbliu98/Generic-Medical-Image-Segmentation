@@ -53,7 +53,7 @@ def preprocess(raw_dir, preprocessed_dir):
             image[i][mask] = (image[i][mask] - image[i][mask].mean()) / (image[i][mask].std() + 1e-8)
             image[i][mask == 0] = 0 # all modalities share same background
         # pick enough locations for each class -> address imbalanced labels
-        # follow nnUNet, 1% * all_locs <= num_locs <= all_locs
+        # follow nnUNet, 0.1 * all_locs <= num_locs <= all_locs
         classes = dataset_json['labels']
         class_locs = OrderedDict()
         approx_num = 10000
