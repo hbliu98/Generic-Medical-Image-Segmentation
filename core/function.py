@@ -49,6 +49,7 @@ def train(model, train_generator, optimizer, criterion, logger, config, epoch):
 
 def inference(model, dataset, logger, config):
     model.eval()
+    
     num_classes = config.DATASET.NUM_CLASSES
     perfs = [AverageMeter() for _ in range(num_classes)]
     nonline = nn.Softmax(dim=1)
@@ -57,14 +58,15 @@ def inference(model, dataset, logger, config):
         dims = config.MODEL.NUM_DIMS
         patch_size = config.INFERENCE.PATCH_SIZE
         patch_overlap = config.INFERENCE.PATCH_OVERLAP
-        # pad data to match patch size
-        target_shape = [case['data'][tio.DATA].shape[1]] + patch_size
-        transform = tio.CropOrPad(target_shape)
-        case = transform(case)
         # torchio does not support 2d slice natively, it can only treat it as pseudo 3d patch
         if dims == 2:
             patch_size = [1] + patch_size
             patch_overlap = [0] + patch_overlap
+        # data shape cannot be smaller than patch size, maybe pad is needed
+        target_shape = np.max([patch_size, case['data'].shape[1:]], 0)
+        transform = tio.CropOrPad(target_shape)
+        case = transform(case)
+        # sliding window
         sampler = tio.inference.GridSampler(case, patch_size, patch_overlap)
         loader = torch.utils.data.DataLoader(sampler, config.INFERENCE.BATCH_SIZE)
         aggregator = tio.inference.GridAggregator(sampler, 'average')
@@ -103,7 +105,7 @@ def inference(model, dataset, logger, config):
             for c in np.unique(label):
                 scores[name][int(c)] = dc(pred==c, label==c)
                 perfs[int(c)].update(scores[name][c])
-        del case    # torchio ...
+        del case
     logger.info('------------ dice scores ------------')
     logger.info(scores)
     for c in range(num_classes):
@@ -115,6 +117,7 @@ def inference(model, dataset, logger, config):
 
 def inference_brats(model, dataset, logger, config):
     model.eval()
+
     perfs = {
         'WT': AverageMeter(),
         'ET': AverageMeter(),
@@ -126,14 +129,15 @@ def inference_brats(model, dataset, logger, config):
         dims = config.MODEL.NUM_DIMS
         patch_size = config.INFERENCE.PATCH_SIZE
         patch_overlap = config.INFERENCE.PATCH_OVERLAP
-        # pad data to match patch size
-        target_shape = [case['data'][tio.DATA].shape[1]] + patch_size
-        transform = tio.CropOrPad(target_shape)
-        case = transform(case)
         # torchio does not support 2d slice natively, it can only treat it as pseudo 3d patch
         if dims == 2:
             patch_size = [1] + patch_size
             patch_overlap = [0] + patch_overlap
+        # data shape cannot be smaller than patch size, maybe pad is needed
+        target_shape = np.max([patch_size, case['data'].shape[1:]], 0)
+        transform = tio.CropOrPad(target_shape)
+        case = transform(case)
+        # sliding window
         sampler = tio.inference.GridSampler(case, patch_size, patch_overlap)
         loader = torch.utils.data.DataLoader(sampler, config.INFERENCE.BATCH_SIZE)
         aggregator = tio.inference.GridAggregator(sampler, 'average')
@@ -170,7 +174,6 @@ def inference_brats(model, dataset, logger, config):
             # only dice score is computed by default, you can also add hd95, assd and sensitivity et al
             scores[name] = {}
             # WT
-            print(np.unique(label))
             scores[name]['WT'] = dc(pred>0, label>0)
             perfs['WT'].update(scores[name]['WT'])
             if 3 in label:  # some case doesn't have enhancing tumor
