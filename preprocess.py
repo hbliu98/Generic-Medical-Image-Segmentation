@@ -31,7 +31,7 @@ def preprocess(raw_dir, preprocessed_dir):
         images = []
         for i in range(len(modality)):
             image = sitk.ReadImage(os.path.join(raw_dir, case['image'][:-7]+'_{:0>4d}'.format(i)+'.nii.gz'))
-            image = sitk.GetArrayFromImage(image)
+            image = sitk.GetArrayFromImage(image).astype('float')
             images.append(image)
         label = sitk.ReadImage(os.path.join(raw_dir, case['label']))
         label = sitk.GetArrayFromImage(label)
